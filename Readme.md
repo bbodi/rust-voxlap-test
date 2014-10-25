@@ -15,7 +15,11 @@ This repository contains all the necessary library files for Windows, and Cargo 
 
 ## SDL2
 
-[rust-voxlap](https://github.com/bbodi/rust-voxlap) is independent from any video dependencies, but the demo uses [Rust-SDL2](https://github.com/AngryLawyer/rust-sdl2) for rendering purposes.
+[rust-voxlap](https://github.com/bbodi/rust-voxlap) is independent from any system dependencies, but the demo uses [Rust-SDL2](https://github.com/AngryLawyer/rust-sdl2) for
+- creating window
+- drawing the scene calculated by Voxlap to the screen (including 2D texts and images)
+- handling input
+- TODO: handling sound
 
 # Installation
 
