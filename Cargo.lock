@@ -1,0 +1,17 @@
+[root]
+name = "rust-voxlap-test"
+version = "0.0.1"
+dependencies = [
+ "sdl2 0.0.1-alpha.1 (git+https://github.com/AngryLawyer/rust-sdl2.git#99c95bd85641234b29b361000681e9df132b5529)",
+ "voxlap 0.0.1",
+]
+
+[[package]]
+name = "sdl2"
+version = "0.0.1-alpha.1"
+source = "git+https://github.com/AngryLawyer/rust-sdl2.git#99c95bd85641234b29b361000681e9df132b5529"
+
+[[package]]
+name = "voxlap"
+version = "0.0.1"
+

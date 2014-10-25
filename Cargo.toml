@@ -1,0 +1,16 @@
+[package]
+
+name = "rust-voxlap-test"
+version = "0.0.1"
+authors = ["bbodi <bodi.balazs@multi-pass.hu>"]
+
+[dependencies.sdl2]
+git = "https://github.com/AngryLawyer/rust-sdl2.git"
+
+[dependencies.voxlap]
+git = "https://github.com/bbodi/rust-voxlap.git"
+# path = "../rust-voxlap"
+
+[profile.release]
+opt-level = 3
+debug = false
