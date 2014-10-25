@@ -2,7 +2,7 @@
 
 name = "rust-voxlap-test"
 version = "0.0.1"
-authors = ["bbodi <bodi.balazs@multi-pass.hu>"]
+authors = ["bbodi <bbodi@gmail.com>"]
 
 [dependencies.sdl2]
 git = "https://github.com/AngryLawyer/rust-sdl2.git"
