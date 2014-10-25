@@ -11,13 +11,17 @@ This demo demonstrates how to use Voxlap engine in Rust through [rust-voxlap](ht
 I tried to pack a lot of showcase feature in this demo, so the scene is a little bit chaotic.
 
 # Requirements
-This repository contains all the necessary library files for Windows, and Cargo (Rust package manager) handles all the dependencies, so you don't need to care a lot about the following requirements.
+
+## 32-bit Rust Nightly installer
+Voxlap functionality is curently provided through a 32-bit dll file, so you need the 32-bit Rust Nightly installer.
+
+This repository contains all the necessary library files for Windows *(SDL2.lib, SDL2.dll, voxlap.lib, voxlap.dll)*, and Cargo *(Rust package manager)* handles all the dependencies, so you don't need to care a lot about the following requirements.
 
 ## SDL2
 
 [rust-voxlap](https://github.com/bbodi/rust-voxlap) is independent from any system dependencies, but the demo uses [Rust-SDL2](https://github.com/AngryLawyer/rust-sdl2) for
 - creating window
-- drawing the scene calculated by Voxlap to the screen (including 2D texts and images)
+- copying the buffer which contains the rendered scene calculated by Voxlap to the screen *(including 2D texts and images)*
 - handling input
 - TODO: handling sound
 
