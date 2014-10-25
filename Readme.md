@@ -27,6 +27,7 @@ Use the Rust Nightly installer and cargo to run the demo:
 
 ```
 git clone https://github.com/bbodi/rust-voxlap-test.git
+cd rust-voxlap-test
 cargo run
 ```
 

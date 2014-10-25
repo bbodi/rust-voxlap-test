@@ -3,7 +3,7 @@ name = "rust-voxlap-test"
 version = "0.0.1"
 dependencies = [
  "sdl2 0.0.1-alpha.1 (git+https://github.com/AngryLawyer/rust-sdl2.git#99c95bd85641234b29b361000681e9df132b5529)",
- "voxlap 0.0.1",
+ "voxlap 0.0.1 (git+https://github.com/bbodi/rust-voxlap.git#504f23a4aa0eb9c9f1706d2bfc050b8b945531a1)",
 ]
 
 [[package]]
@@ -14,4 +14,5 @@ source = "git+https://github.com/AngryLawyer/rust-sdl2.git#99c95bd85641234b29b36
 [[package]]
 name = "voxlap"
 version = "0.0.1"
+source = "git+https://github.com/bbodi/rust-voxlap.git#504f23a4aa0eb9c9f1706d2bfc050b8b945531a1"
 
