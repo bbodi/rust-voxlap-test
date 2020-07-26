@@ -5,9 +5,9 @@ use voxlap::Image;
 
 // TODO: create and return a Voxel Sprite
 pub fn voxelize(voxlap: &mut voxlap::Voxlap, front_img: &Image, right_img: &Image, back_img: &Image, pos: ivec3) {
-	for x in range (0, front_img.width) {
-		for y in range (0, front_img.height) {
-			for z in range (0, right_img.width) {
+	for x in 0 .. front_img.width {
+		for y in 0 .. front_img.height {
+			for z in 0 .. right_img.width {
 
 				let front_color = front_img.get_pixel(x, y);
 				let left_color = right_img.get_pixel(z, y);
@@ -24,7 +24,7 @@ pub fn voxelize(voxlap: &mut voxlap::Voxlap, front_img: &Image, right_img: &Imag
 				}
 
 				let mut drawing_color = None;
-				let pos = ivec3::new((pos.x+x as i32), (pos.y+z as i32), (pos.z+y as i32));
+				let pos = ivec3::new(pos.x+x as i32, pos.y+z as i32, pos.z+y as i32);
 
 				if front_color == left_color {
 					drawing_color = Some(front_color);

@@ -1,14 +1,13 @@
 extern crate voxlap;
 
-use std::collections::RingBuf;
-use std::collections::Deque;
+use std::collections::VecDeque;
 use std::cmp::min;
 use std::cmp::max;
 
 use voxlap::RenderContext;
 
 pub struct Chart {
-    data: RingBuf<u32>,
+    data: VecDeque<u32>,
     x: u32,
     y: u32,
     max_elem_count: u32,
@@ -21,7 +20,7 @@ pub struct Chart {
 impl Chart {
     pub fn new() -> Chart {
         Chart {
-            data: RingBuf::new(),
+            data: VecDeque::new(),
             x: 0,
             y: 0,
             max_elem_count: 100,
@@ -63,10 +62,9 @@ impl Chart {
 
     fn draw_bars(&self, dst: &RenderContext) {
         let mut last_value = 0f32;
-        for iter in self.data.iter().enumerate() {
-            let (index, value) = iter;
+        for (index, value) in self.data.iter().enumerate() {
             let cur_value = min(*value, self.max_height);
-            for i in range(0, self.column_width) {
+            for i in 0 .. self.column_width {
                 let x1 = max(0, self.right_x as i32 - (index as i32*self.column_width as i32 + i as i32));
                 //let y1 = self.bottom_y - min(*value, self.max_height);
                 let p = i as f32 / self.column_width as f32;
@@ -81,7 +79,7 @@ impl Chart {
     }
 
     fn draw_gradient_bar(&self, dst: &RenderContext, x:u32, value: u32, start_color: voxlap::Color, end_color: voxlap::Color) {
-        for i in range(0, value) {
+        for i in 0 .. value {
             //let p = min(self.max_height, (y2-y)) as f32 / self.max_height as f32;
             let p = i as f32 / self.max_height as f32;
             //println!("cur_point_value = {}, sp = {}", cur_point_value, sp);
@@ -115,9 +113,9 @@ impl Chart {
 
     pub fn add_data(&mut self, data: u32) {
         self.data.push_front(data);
-            if self.data.len() >= 100 {
-             self.data.pop();
-         }
+        if self.data.len() >= 100 {
+            self.data.pop_back();
+        }
     }
 
     pub fn draw(&self, dst: &RenderContext) {
@@ -128,7 +126,7 @@ impl Chart {
         let current_fps = *self.data.front().unwrap_or(&0);
         let y_pos = self.bottom_y - min(current_fps, self.max_height);
         if y_pos + 7 < 600 {
-            dst.print6x8(self.right_x, self.bottom_y - current_fps, voxlap::Color::rgb(255, 255, 255), None, format!("{}", current_fps).as_slice());
+            dst.print6x8(self.right_x, self.bottom_y - current_fps, voxlap::Color::rgb(255, 255, 255), None, &format!("{}", current_fps)[..]);
         }
     }
 }

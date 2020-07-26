@@ -1,8 +1,8 @@
 extern crate voxlap;
 
-use std::rand::random;
-use std::rand::task_rng;
-use std::rand::Rng;
+use rand::random;
+use rand::thread_rng;
+use rand::Rng;
 use std::default::Default;
 use std::cmp::max;
 
@@ -10,12 +10,12 @@ use voxlap::ivec3;
 
 
 
-pub fn generate_heightmap(width: uint, height: uint, max_diff: i32) -> Vec<u8> {
-	let mut rng = task_rng();
-	let a = rng.gen_range::<u8>(10, 200);
-	let b = rng.gen_range::<u8>(10, 200);
-	let c = rng.gen_range::<u8>(10, 200);
-	let d = rng.gen_range::<u8>(10, 200);
+pub fn generate_heightmap(width: usize, height: usize, max_diff: i32) -> Vec<u8> {
+	let mut rng = thread_rng();
+	let a:u8 = rng.gen_range(10, 200);
+	let b:u8 = rng.gen_range(10, 200);
+	let c:u8 = rng.gen_range(10, 200);
+	let d:u8 = rng.gen_range(10, 200);
 
 	let mut heightmap_buffer = Buffer2D::<u8>::new(width, height);
 	heightmap_buffer.set(0, 0, a);
@@ -29,13 +29,13 @@ pub fn generate_heightmap(width: uint, height: uint, max_diff: i32) -> Vec<u8> {
 
 struct Buffer2D<T>	{
 	buffer: Vec<T>,
-	width: uint,
+	width: usize,
 }
 
 impl<T: Clone + Default> Buffer2D<T> {
-	fn new(width: uint, height: uint) -> Buffer2D<T>  {
-		let mut buff = Vec::<T>::with_capacity((width * height) as uint);
-		for _ in range(0, width * height) {
+	fn new(width: usize, height: usize) -> Buffer2D<T>  {
+		let mut buff = Vec::<T>::with_capacity((width * height) as usize);
+		for _ in 0 .. width * height {
 			let value: T = Default::default();
 			buff.push(value);
 		}
@@ -45,27 +45,28 @@ impl<T: Clone + Default> Buffer2D<T> {
 		};
 	}
 
-	fn get(&self, x: uint, y: uint) -> T {
+	fn get(&self, x: usize, y: usize) -> T {
 		let index = y * self.width + x;
 		self.buffer[index].clone()
 	}
 
-	fn set(&mut self, x: uint, y: uint, value: T) {
+	fn set(&mut self, x: usize, y: usize, value: T) {
 		let index = y * self.width + x;
 		self.buffer[index] = value;
 	}
 }
 
-fn diamond_step(offset_x: uint, offset_y: uint, width: uint, height: uint, buff: &mut Buffer2D<u8>, max_diff: i32) {
+fn diamond_step(offset_x: usize, offset_y: usize, width: usize, height: usize, buff: &mut Buffer2D<u8>, max_diff: i32) {
+	let mut rng = rand::thread_rng();
 	let a = buff.get(offset_x, 				offset_y);
 	let b = buff.get(offset_x + width-1, 	offset_y);
 	let c = buff.get(offset_x, 				offset_y + height-1);
 	let d = buff.get(offset_x + width-1, 	offset_y + height-1);
-	let e = (max(0, (a + b + c + d) as i32 / 4 + (random::<i32>()%max_diff - (max_diff/2)))) as u8;
+	let e = (max(0, (a as i32 + b as i32 + c as i32 + d as i32) / 4 + rng.gen_range(-max_diff/2, max_diff/2) )) as u8;
 	buff.set(offset_x + width/2, offset_y + height/2, e as u8);
 }
 
-fn square_step(offset_x: uint, offset_y: uint, width: uint, height: uint, buff: &mut Buffer2D<u8>, max_diff: i32) {
+fn square_step(offset_x: usize, offset_y: usize, width: usize, height: usize, buff: &mut Buffer2D<u8>, max_diff: i32) {
 	let w_half = width / 2;
 	let h_half = height / 2;
 
@@ -74,17 +75,17 @@ fn square_step(offset_x: uint, offset_y: uint, width: uint, height: uint, buff: 
 	let c = buff.get(offset_x, 				offset_y + height-1);
 	let d = buff.get(offset_x + width-1, 	offset_y + height-1);
 	let e = buff.get(offset_x + w_half,	offset_y + h_half);
-	let f = (a + c + e) / 3;
-	let g = (a + b + e) / 3;
-	let h = (b + d + e) / 3;
-	let i = (c + d + e) / 3;
+	let f = (a as i32 + c as i32 + e as i32) / 3;
+	let g = (a as i32 + b as i32 + e as i32) / 3;
+	let h = (b as i32 + d as i32 + e as i32) / 3;
+	let i = (c as i32 + d as i32 + e as i32) / 3;
 	buff.set(offset_x, 				offset_y + h_half, 	f as u8);
-	buff.set(offset_x + w_half, 	offset_y, 				g as u8);
+	buff.set(offset_x + w_half, 	offset_y, 			g as u8);
 	buff.set(offset_x + width-1, 	offset_y + h_half, 	h as u8);
-	buff.set(offset_x + w_half, 	offset_y + height-1, 	i as u8);
+	buff.set(offset_x + w_half, 	offset_y + height-1,i as u8);
 }
 
-fn diamond_square(offset_x: uint, offset_y: uint, width: uint, height: uint, buff: &mut Buffer2D<u8>, max_diff: i32) {
+fn diamond_square(offset_x: usize, offset_y: usize, width: usize, height: usize, buff: &mut Buffer2D<u8>, max_diff: i32) {
 	diamond_step(offset_x, offset_y, width, height, buff, max_diff);
 	square_step(offset_x, offset_y, width, height, buff, max_diff);
 
@@ -100,22 +101,22 @@ fn diamond_square(offset_x: uint, offset_y: uint, width: uint, height: uint, buf
 }
 
 pub fn create_grass(voxlap: &mut voxlap::Voxlap, x1: u32, y1: u32, x2: u32, y2: u32) {
-	let mut rng = task_rng();
-	for x in range(x1, x2) {
-		for y in range(y1, y2) {
-			let height = rng.gen_range::<i32>(0, 10);
-			for z in range(0, height) {
-				let (r, g, b) = if z < 7 {
+	let mut rng = thread_rng();
+	for x in x1 .. x2 {
+		for y in y1 .. y2 {
+			let height : i32 = rng.gen_range(0, 10);
+			for z in 0 .. height {
+				let (r, g, b) : (u8, u8, u8) = if z < 7 {
 					(
-						rng.gen_range::<u8>(0, 100),
-						rng.gen_range::<u8>(150, 255),
-						rng.gen_range::<u8>(0, 100)
+						rng.gen_range(0, 100),
+						rng.gen_range(150, 255),
+						rng.gen_range(0, 100)
 					)
 				} else {
 					(
-						rng.gen_range::<u8>(0, 100),
-						rng.gen_range::<u8>(200, 255),
-						rng.gen_range::<u8>(0, 100)
+						rng.gen_range(0, 100),
+						rng.gen_range(200, 255),
+						rng.gen_range(0, 100)
 					)
 				};
 				voxlap.set_cube(&ivec3::new(x as i32, y as i32, 127 - z), Some(voxlap::Color::rgb(r, g, b)));
