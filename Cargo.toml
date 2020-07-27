@@ -16,7 +16,7 @@ default-features = false
 features = ["bundled"]
 
 [dependencies.voxlap]
-git = "https://github.com/NCrashed/rust-voxlap.git"
+git = "https://github.com/bbodi/rust-voxlap.git"
 # path = "../rust-voxlap"
 
 [profile.release]
