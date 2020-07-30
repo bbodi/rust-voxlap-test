@@ -15,7 +15,7 @@ I tried to pack a lot of showcase feature in this demo, so the scene is a little
 ## 32-bit Rust Nightly installer
 Voxlap functionality is curently provided through a 32-bit dll file, so you need the 32-bit Rust Nightly installer.
 
-This repository contains all the necessary library files for Windows *(SDL2.lib, SDL2.dll, voxlap.lib, voxlap.dll)*, and Cargo *(Rust package manager)* handles all the dependencies, so you don't need to care a lot about the following requirements.
+This repository contains all the necessary library files for Windows *(voxlap.lib, voxlap.dll)*, SDL2 is provided via `bundled` feature, and Cargo *(Rust package manager)* handles all the dependencies, so you don't need to care a lot about the following requirements.
 
 ## SDL2
 
@@ -33,6 +33,12 @@ Use the Rust Nightly installer and cargo to run the demo:
 git clone https://github.com/bbodi/rust-voxlap-test.git
 cd rust-voxlap-test
 cargo run
+```
+
+For x86_64 platform you should run with:
+```
+rustup target add i686-pc-windows-msvc
+cargo run --target=i686-pc-windows-msvc
 ```
 
 ## Voxlap libraries

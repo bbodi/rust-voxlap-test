@@ -1,12 +1,14 @@
+extern crate num;
+extern crate rand;
 extern crate voxlap;
 
-use std::iter::range_step_inclusive;
-use std::rand::random;
+use rand::{random};
 
 use voxlap::Voxlap;
 use voxlap::vec3;
+use self::num::range_step_inclusive;
 
-#[deriving(Show)]
+#[derive(Debug, Clone, Copy)]
 pub enum PlasmaType {
 	Single(u32),
 	Multi(u32),
@@ -15,16 +17,17 @@ pub enum PlasmaType {
 }
 
 impl PlasmaType {
-	pub fn get_click_delay(&self) -> uint {
+	pub fn get_click_delay(&self) -> u32 {
 		match *self {
-			Single(_) => 1000,
-			Multi(_) => 1000,
-			Rapid => 200,
-			Bomb => 20000,
+			PlasmaType::Single(_) => 1000,
+			PlasmaType::Multi(_) => 1000,
+			PlasmaType::Rapid => 200,
+			PlasmaType::Bomb => 20000,
 		}
 	}
 }
 
+#[derive(Debug, Clone, Copy)]
 struct Plasma {
 	pos: vec3,
 	dir: vec3,
@@ -46,19 +49,19 @@ impl Plasma {
 
 	fn get_size(&self) -> u32 {
 		match self.typ {
-			Single(level) => level,
-			Multi(level) => level,
-			Rapid => 4,
-			Bomb => 100,
+			PlasmaType::Single(level) => level,
+			PlasmaType::Multi(level) => level,
+			PlasmaType::Rapid => 4,
+			PlasmaType::Bomb => 100,
 		}
 	}
 
 	fn get_speed(&self) -> f32 {
 		match self.typ {
-			Multi(_) => 3f32,
-			Single(_) => 4f32,
-			Rapid => 10f32,
-			Bomb => 1f32,
+			PlasmaType::Multi(_) => 3f32,
+			PlasmaType::Single(_) => 4f32,
+			PlasmaType::Rapid => 10f32,
+			PlasmaType::Bomb => 1f32,
 		}
 	}
 }
@@ -70,10 +73,10 @@ struct FallingSprite {
 
 pub struct PlasmaManager {
 	plasmas: Vec<Plasma>,
-	last_nonfree_plasma_index: uint,
+	last_nonfree_plasma_index: usize,
 	falling_sprites: Vec<FallingSprite>,
-	free_plasmas: uint,
-	all_plasmas: uint,
+	free_plasmas: usize,
+	all_plasmas: usize,
 }
 
 impl PlasmaManager {
@@ -128,7 +131,7 @@ impl PlasmaManager {
 			let mut destruct_plasma = false;
 			let mut create_new_plasma = false;
 			let mut melting_pos = None;
-			if let Multi(level) = plasma.typ {
+			if let PlasmaType::Multi(level) = plasma.typ {
 				plasma.dir = plasma.dir + vec3::new(0f32, 0f32, 0.01f32);
 				if level > 1 && plasma.born_tick + 4000 < tick {
 					create_new_plasma = true;
@@ -136,23 +139,23 @@ impl PlasmaManager {
 				}
 			}
 			if !destruct_plasma {
-				if let voxlap::CannotSee(hit_pos) = voxlap.can_see(&plasma.pos, &old_pos) {
+				if let voxlap::VisibilityResult::CannotSee(hit_pos) = voxlap.can_see(&plasma.pos, &old_pos) {
 					match plasma.typ {
-						Single(level) => {
+						PlasmaType::Single(level) => {
 							if level <= 1 {
 								destruct_plasma = true;
 							} else {
-								plasma.typ = Single(level-2)
+								plasma.typ = PlasmaType::Single(level-2)
 							}
 						}
-						Rapid => {destruct_plasma = true;},
-						Multi(level) => {
+						PlasmaType::Rapid => {destruct_plasma = true;},
+						PlasmaType::Multi(level) => {
 							if level > 1 {
 								create_new_plasma = true;
 								destruct_plasma = true;
 							}
 						},
-						Bomb => {destruct_plasma = true;},
+						PlasmaType::Bomb => {destruct_plasma = true;},
 					}
 					melting_pos = Some(hit_pos);
 				}
@@ -162,8 +165,8 @@ impl PlasmaManager {
 				let size = plasma.get_size();
 				let (spr, _) = voxlap.melt_sphere(&hit_pos, size);
 				let mut random_dir = random::<vec3>();
-				for _ in range(0, 5i32) {
-					if let voxlap::CanSee = voxlap.can_see(&hit_pos.to_vec3(), &random_dir) {
+				for _ in 0 .. 5i32 {
+					if let voxlap::VisibilityResult::CanSee = voxlap.can_see(&hit_pos.to_vec3(), &random_dir) {
 						break;
 					}
 					random_dir = random::<vec3>();
@@ -172,7 +175,7 @@ impl PlasmaManager {
 					spr: spr,
 					dir: random_dir,
 				});
-				voxlap.set_sphere(&hit_pos, size, voxlap::Remove);
+				voxlap.set_sphere(&hit_pos, size, voxlap::CsgOperationType::Remove);
 			}
 			if create_new_plasma {
 				new_plasmas.push(*plasma);
@@ -211,14 +214,14 @@ impl PlasmaManager {
 	fn handle_new_plasmas(&mut self, new_plasmas: &Vec<Plasma>) {
 		for plasma in new_plasmas.iter() {
 			let level = match plasma.typ {
-				Multi(l) => l,
+				PlasmaType::Multi(l) => l,
 				_ => 1,
 			};
 			if level <= 1 {
 				continue;
 			}
-			for _ in range(0, 5i32) {
-				self.add_plasma(&plasma.pos, &(random::<vec3>()*2f32), 0, Multi(level/2));
+			for _ in 0 .. 5i32 {
+				self.add_plasma(&plasma.pos, &(random::<vec3>()*2f32), 0, PlasmaType::Multi(level/2));
 			}
 		}
 	}
@@ -229,13 +232,13 @@ impl PlasmaManager {
 				continue;
 			}
 			let color = match plasma.typ {
-				Single(_) => voxlap::Color::rgb(0x99, 0, 0x99),
-				Multi(_) => random::<voxlap::Color>(),
+				PlasmaType::Single(_) => voxlap::Color::rgb(0x99, 0, 0x99),
+				PlasmaType::Multi(_) => random::<voxlap::Color>(),
 				Rapid => voxlap::Color::rgb(255, 255, 255),
 				Bomb => voxlap::Color::rgb(255, 0, 0),
 			};
 			let size = plasma.get_size();
-			for k in  range_step_inclusive(16i, 0, -1) {
+			for k in  range_step_inclusive(16i32, 0, -1) {
 				let f = k as f32;
 				let radius = ((16f32 - f)).sqrt() *(f*f) * 0.004f32 * (size as f32);
 				let pos_modifier_vec = plasma.dir*((f-8f32)*-0.25f32*(size as f32));

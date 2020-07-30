@@ -4,8 +4,16 @@ name = "rust-voxlap-test"
 version = "0.0.1"
 authors = ["bbodi <bbodi@gmail.com>"]
 
+[dependencies]
+rand = "^0.7"
+num = "^0.3"
+ascii = "^1.0"
+ringbuf = "^0.2"
+
 [dependencies.sdl2]
-git = "https://github.com/AngryLawyer/rust-sdl2.git"
+version = "^0.34"
+default-features = false
+features = ["bundled"]
 
 [dependencies.voxlap]
 git = "https://github.com/bbodi/rust-voxlap.git"
