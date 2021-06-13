@@ -206,6 +206,7 @@ impl PlasmaManager {
 			}
 			falling_sprite.dir = falling_sprite.dir + vec3::new(0f32, 0f32, 0.01f32);
 		}
+		removing_indices.sort_by(|a, b| b.cmp(a));
 		for i in removing_indices.iter() {
 			self.falling_sprites.remove(*i);
 		}
